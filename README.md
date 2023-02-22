@@ -31,4 +31,6 @@ The IV is then used along with the secret key to create a Cipher object using cr
 The Cipher object is used to encrypt the input string in chunks using cipher.update() and cipher.final(). The resulting encrypted string is then returned along with the IV.
 
 ### Encrypt and decrypt using asymmetric encryption
+It generates a public/private RSA key pair with a modulus length of 4096 bits, using the `generateKeyPairSync` method of the `crypto` module.
 
+It also specifies that the private key should be passphrase-protected with the cipher `aes-256-cbc` and the passphrase.
