@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@inquirer/editor": "^0.0.21-alpha.0",
     "dotenv": "^16.0.3",
     "inquirer": "^9.1.4"
   },

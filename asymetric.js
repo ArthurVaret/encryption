@@ -1,16 +1,12 @@
 import crypto from 'crypto'
 import inquirer from 'inquirer'
+import editor from '@inquirer/editor';
 import fs from 'fs'
 import dotenv from 'dotenv'
 dotenv.config()
 
 // 1. Generate a public/private RSA key pair
 async function generateKeyPair(){
-    const {passphrase} = await inquirer.prompt({
-        type: 'input',
-        name: 'passphrase',
-        message: 'Enter the passphrase:',
-    });
     const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
         modulusLength: 4096,
         publicKeyEncoding: {
@@ -20,8 +16,6 @@ async function generateKeyPair(){
         privateKeyEncoding: {
             type: 'pkcs8',
             format: 'pem',
-            cipher: 'aes-256-cbc',
-            passphrase: passphrase,
         }});
     fs.writeFile('public.pem', publicKey, 'utf8', function (err) {
         if (err) return console.log(err);
@@ -31,23 +25,11 @@ async function generateKeyPair(){
     });
     console.log('key generated successfully');
 }
-function getPublicKey(callback){
-    fs.readFile('public.pem', 'utf8', function (err,data) {
-            if (err) {
-                return console.log(err);
-            }
-            callback(data)
-        }
-    );
+function getPublicKey(){
+    return fs.readFileSync('public.pem', 'utf8')
 }
-function getPrivateKey(callback){
-    fs.readFile('private.pem', 'utf8', function (err,data) {
-            if (err) {
-                return console.log(err);
-            }
-            callback(data)
-        }
-    );
+function getPrivateKey(){
+    return fs.readFileSync('private.pem', 'utf8')
 }
 // 2. Write a function that encrypts a message using the public key
 async function encrypt() {
@@ -57,43 +39,18 @@ async function encrypt() {
         message: 'Enter the message to encrypt:',
     });
     const buffer = Buffer.from(message, 'utf-8');
-    return getPublicKey(function(publicKey) {
-        const encrypted = crypto.publicEncrypt(publicKey, buffer);
-        console.log(encrypted.toString('base64'));
-        return encrypted.toString('base64');
-    });
+    const encrypted = crypto.publicEncrypt(getPublicKey(), buffer);
+    console.log(encrypted.toString('base64'));
 }
 
 // 3. Write a function that decrypts a message using the private key
 async function decrypt(){
-    const {message} = await inquirer.prompt({
-        type: 'input',
-        name: 'message',
+    const message = await editor({
         message: 'Enter the message to decrypt:',
     });
-    const {passphrase} = await inquirer.prompt({
-        type: 'input',
-        name: 'passphrase',
-        message: 'Enter the passphrase:',
-    });
-    const buffer = Buffer.from(message, 'utf-8');
-    return getPrivateKey(function(privateKey) {
-        try{
-            const decrypted = crypto.privateDecrypt(
-                {
-                    key: privateKey,
-                    passphrase: passphrase,
-                },
-                buffer
-            );
-            console.log(decrypted.toString('base64'));
-            return decrypted.toString('base64');
-        }
-        catch(error){
-            console.log(error)
-            return error
-        }
-    });
+    const buffer = Buffer.from(message, 'base64');
+    const decrypted = crypto.privateDecrypt(getPrivateKey(), buffer);
+    console.log(decrypted.toString('utf-8'));
 }
 
 async function run() {
@@ -123,3 +80,4 @@ async function run() {
     }
     }
 run();
+//console.log(fs.readFileSync('public.pem', 'utf8'))

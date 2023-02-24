@@ -33,4 +33,6 @@ The Cipher object is used to encrypt the input string in chunks using cipher.upd
 ### Encrypt and decrypt using asymmetric encryption
 It generates a public/private RSA key pair with a modulus length of 4096 bits, using the `generateKeyPairSync` method of the `crypto` module.
 
-It also specifies that the private key should be passphrase-protected with the cipher `aes-256-cbc` and the passphrase.
+It also specifies that the private key should be passphrase-protected with the cipher `aes-256-cbc` and the passphrase (did not use a cypher and a passphrase in this project).
+
+Using inquirer for the cli tool and `inquirer/editor` for long text entries.
